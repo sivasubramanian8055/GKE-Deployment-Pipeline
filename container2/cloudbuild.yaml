@@ -1,0 +1,22 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_IMAGE_2_NAME}:$SHORT_SHA','-t' ,'${_IMAGE_2_NAME}:latest', './container2']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '--all-tags','${_IMAGE_2_NAME}']
+  - name: "gcr.io/cloud-builders/gke-deploy"
+    args:
+      - run
+      - --filename=./k8s
+      - --image=${_IMAGE_2_NAME}:$SHORT_SHA
+      - --location=${_CLUSTER_LOCATION}
+      - --cluster=${_CLUSTER_NAME}
+
+
+substitutions:
+  _IMAGE_2_NAME: 'us-docker.pkg.dev/cloud-computing-428321/cloud-computing/service2'
+  _CLUSTER_LOCATION: 'us-central1-c'
+  _CLUSTER_NAME: 'my-gke-cluster'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+

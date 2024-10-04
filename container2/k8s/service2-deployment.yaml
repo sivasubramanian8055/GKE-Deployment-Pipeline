@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service2-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service2
+  template:
+    metadata:
+      labels:
+        app: service2
+    spec:
+      containers:
+        - name: service2
+          image: us-docker.pkg.dev/cloud-computing-428321/cloud-computing/service2
+          volumeMounts:
+            - mountPath: /app/storage
+              name: shared-storage
+      volumes:
+        - name: shared-storage
+          persistentVolumeClaim:
+            claimName: shared-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service2-service
+spec:
+  type: ClusterIP
+  selector:
+    app: service2
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 7000
